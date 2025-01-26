@@ -16,6 +16,7 @@ class Image(Timestamp, Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     url = Column(String, nullable=False)
+    is_processed = Column(Boolean, nullable=False, default=False)
     is_nsfw = Column(Boolean, nullable=True)
-    detected_nsfw_objects = Column(JSON, nullable=True)
+    detected_nsfw = Column(JSON, nullable=True)
     detected_objects = Column(JSON, nullable=True)

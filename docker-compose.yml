@@ -10,7 +10,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_started
-      minio:
+      storage:
         condition: service_started
       db:
         condition: service_healthy
@@ -23,7 +23,7 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
 
-  minio:
+  storage:
     image: minio/minio
     ports:
       - "9000:9000"

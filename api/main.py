@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.dbutils import engine, Base
+from routers.images import router as images_router
 
 app = FastAPI(title="Simple FastAPI App")
 origins = ["*"]
@@ -12,6 +13,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(images_router)
 
 @app.on_event("startup")
 async def startup_event():
