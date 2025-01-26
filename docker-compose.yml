@@ -1,12 +1,19 @@
 services:
-  backend:
+  api:
     build:
       context: ./api
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:dbpassword@db:5432/media_detect
+      - AWS_S3_ENDPOINT_URL=http://storage:9000
     ports:
       - "8000:8000"
     depends_on:
-      - rabbitmq
-      - minio
+      rabbitmq:
+        condition: service_started
+      minio:
+        condition: service_started
+      db:
+        condition: service_healthy
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -27,3 +34,22 @@ services:
     volumes:
       - ./storage:/data
     command: server /data --console-address ":9001"
+
+  db:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=dbpassword
+      - POSTGRES_DB=media_detect
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
