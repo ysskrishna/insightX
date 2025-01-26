@@ -4,3 +4,14 @@ services:
       context: ./api
     ports:
       - "8000:8000"
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
