@@ -6,6 +6,7 @@ services:
       - "8000:8000"
     depends_on:
       - rabbitmq
+      - minio
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -14,4 +15,15 @@ services:
       - "15672:15672"
     environment:
       - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadminpassword  
+    volumes:
+      - ./storage:/data
+    command: server /data --console-address ":9001"
