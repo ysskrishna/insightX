@@ -18,5 +18,6 @@ class Image(Timestamp, Base):
     storage_path = Column(String, nullable=False)
     is_processed = Column(Boolean, nullable=False, default=False)
     is_nsfw = Column(Boolean, nullable=True)
+    processed_image_path = Column(String, nullable=True)
     detected_nsfw = Column(JSON, nullable=True)
     detected_objects = Column(JSON, nullable=True)

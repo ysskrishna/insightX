@@ -50,7 +50,7 @@ async def upload_image(
         "image_id": image.image_id,
         "name": image.name
     }
-    
+
 @router.post("/{image_id}/detection_result")
 async def update_detection_result(
     image_id: int,
@@ -68,7 +68,8 @@ async def update_detection_result(
             is_processed=True,
             detected_objects=results.detected_objects,
             is_nsfw=results.is_nsfw,
-            detected_nsfw=results.detected_nsfw
+            detected_nsfw=results.detected_nsfw,
+            processed_image_path=results.processed_image_path
         )
     )
     
@@ -76,3 +77,22 @@ async def update_detection_result(
     await db.commit()
     
     return {"message": "Detection results updated successfully"}
+
+
+@router.get("/{image_id}/processed_presigned_url")
+async def get_processed_presigned_url(
+    image_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    image = await db.get(Image, image_id)
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    processed_path = f"processed/{image.storage_path.split('/')[-1]}"
+    presigned_url = s3_client.generate_presigned_put_url(processed_path)
+    
+    return {
+        "image_id": image.image_id,
+        "presigned_url": presigned_url,
+        "processed_path": processed_path
+    }
