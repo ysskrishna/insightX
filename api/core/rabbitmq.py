@@ -11,13 +11,16 @@ class RabbitMQClient:
             )
         )
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=Config.RABBITMQ_IMAGE_PROCESSING_QUEUE)
+        self.channel.queue_declare(queue=Config.RABBITMQ_IMAGE_PROCESSING_QUEUE, durable=True)
 
     def publish_message(self, message: dict):
         self.channel.basic_publish(
             exchange='',
             routing_key=Config.RABBITMQ_IMAGE_PROCESSING_QUEUE,
-            body=json.dumps(message)
+            body=json.dumps(message),
+            properties=pika.BasicProperties(
+                delivery_mode=2
+            )
         )
 
     def close(self):
