@@ -1,8 +1,8 @@
 import asyncio
 import aio_pika
 import logging
-from core.image_processor import process_message
 from core.config import Config
+from processors.image_processor import process_message
 
 
 logging.basicConfig(level=logging.INFO)
