@@ -3,7 +3,7 @@ import logging
 import aio_pika
 import numpy as np
 import aiohttp
-from PIL import Image
+from PIL import Image, ImageDraw
 from io import BytesIO
 from nudenet import NudeDetector
 from core.config import Config
@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 nude_detector = NudeDetector()
 
 model = YOLO('yolov8n.pt')
+
+PROCESSED_IMAGE_CONTENT_TYPE = 'image/jpeg'
 
 def run_yolo_detection(image):
     results = model(image)
@@ -46,14 +48,15 @@ def run_nsfw_detection(image):
         logger.error(f"Error running NSFW detection: {e}")
         return []
 
-async def update_detection_results(image_id, detected_objects, nsfw_detections):
+async def update_detection_results(image_id, detected_objects, nsfw_detections, processed_image_path):
     async with aiohttp.ClientSession() as session:
         try:
             payload = {
                 'image_id': image_id,
                 'detected_objects': detected_objects,
                 'is_nsfw': len(nsfw_detections) > 0,
-                'detected_nsfw': nsfw_detections
+                'detected_nsfw': nsfw_detections,
+                'processed_image_path': processed_image_path
             }
             
             async with session.post(
@@ -68,6 +71,55 @@ async def update_detection_results(image_id, detected_objects, nsfw_detections):
         except Exception as e:
             logger.error(f"Error updating detection results via API: {e}")
             raise
+
+def draw_detections(image, detections):
+    draw = ImageDraw.Draw(image)
+    
+    for detection in detections:
+        box = detection['box']
+        label = detection['class']
+        conf = detection['confidence']
+        
+        # Draw rectangle
+        draw.rectangle(box, outline='red', width=2)
+        
+        # Draw label
+        text = f"{label} {conf:.2f}"
+        draw.text((box[0], box[1] - 10), text, fill='red')
+    
+    return image
+
+async def upload_image_to_presigned_url(image, presigned_url):
+    try:
+        img_byte_arr = BytesIO()
+        image.save(img_byte_arr, format='JPEG')
+        img_byte_arr = img_byte_arr.getvalue()
+        
+        headers = {
+            'Content-Type': 'image/jpeg'
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.put(presigned_url, headers=headers, data=img_byte_arr) as response:
+                if response.status != 200:
+                    raise Exception(f"Failed to upload image: {response.status}")
+                return presigned_url.split('?')[0]  # Return the S3 path without query parameters
+    except Exception as e:
+        logger.error(f"Error uploading image to presigned URL: {e}")
+        raise
+
+async def get_processed_presigned_url(image_id: int) -> tuple[str, str]:
+    async with aiohttp.ClientSession() as session:
+        payload = {
+            "storage_path": f"processed/{image_id}/detected.jpg",
+            "content_type": PROCESSED_IMAGE_CONTENT_TYPE,
+            "expires_in": 3600
+        }
+        async with session.post(f"{Config.API_BASE_URL}/images/{image_id}/processed_presigned_url", json=payload) as response:
+            if response.status != 200:
+                raise Exception(f"Failed to get presigned URL: {response.status}")
+            presigned_data = await response.json()
+            print(presigned_data)
+            return presigned_data.get('presigned_url'), presigned_data.get('storage_path')
 
 async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None:
     async with message.process():
@@ -87,7 +139,17 @@ async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None
             detected_objects = run_yolo_detection(image)
             logger.info(f"YOLO detections: {detected_objects}")
             
-            await update_detection_results(body['image_id'], detected_objects, nsfw_detections)
+            # Generate image with detections
+            image_with_detections = draw_detections(image, detected_objects)
+            
+            # Get presigned URL and processed path
+            presigned_url, processed_image_path = await get_processed_presigned_url(body['image_id'])
+            
+            # Upload image to presigned URL
+            await upload_image_to_presigned_url(image_with_detections, presigned_url)
+            
+            # Update detection results
+            await update_detection_results(body['image_id'], detected_objects, nsfw_detections, processed_image_path)
             
         except Exception as e:
             logger.error(f"Error processing message: {e}")
