@@ -4,6 +4,8 @@ from core.dbutils import get_db
 from core.models import Image
 from core.rabbitmq import rabbitmq_client
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import update
+from core.schemas import ImageDetectionResultSchema
 
 router = APIRouter(prefix="/images", tags=["images"])
 
@@ -49,3 +51,28 @@ async def upload_image(
         "name": image.name
     }
     
+@router.post("/{image_id}/detection_result")
+async def update_detection_result(
+    image_id: int,
+    results: ImageDetectionResultSchema,
+    db: AsyncSession = Depends(get_db)
+):
+    image = await db.get(Image, image_id)
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    stmt = (
+        update(Image)
+        .where(Image.image_id == image_id)
+        .values(
+            is_processed=True,
+            detected_objects=results.detected_objects,
+            is_nsfw=results.is_nsfw,
+            detected_nsfw=results.detected_nsfw
+        )
+    )
+    
+    await db.execute(stmt)
+    await db.commit()
+    
+    return {"message": "Detection results updated successfully"}
