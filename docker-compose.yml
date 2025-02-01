@@ -5,11 +5,12 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:dbpassword@db:5432/media_detect
       - AWS_S3_ENDPOINT_URL=http://storage:9000
+      - RABBITMQ_HOST=rabbitmq
     ports:
       - "8000:8000"
     depends_on:
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
       storage:
         condition: service_started
       db:
@@ -22,7 +23,13 @@ services:
       - "15672:15672"
     environment:
       - RABBITMQ_DEFAULT_USER=guest
-
+      - RABBITMQ_DEFAULT_PASS=guestpassword
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
   storage:
     image: minio/minio
     ports:

@@ -13,9 +13,9 @@ class Timestamp:
 class Image(Timestamp, Base):
     __tablename__ = "images"
 
-    id = Column(Integer, primary_key=True)
+    image_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    url = Column(String, nullable=False)
+    storage_path = Column(String, nullable=False)
     is_processed = Column(Boolean, nullable=False, default=False)
     is_nsfw = Column(Boolean, nullable=True)
     detected_nsfw = Column(JSON, nullable=True)
