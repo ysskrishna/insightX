@@ -5,7 +5,7 @@ from core.models import Image
 from core.rabbitmq import rabbitmq_client
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update
-from core.schemas import ImageDetectionResultSchema
+from core.schemas import ImageDetectionResultSchema, ProcessedPresignedUrlSchema
 
 router = APIRouter(prefix="/images", tags=["images"])
 
@@ -79,20 +79,20 @@ async def update_detection_result(
     return {"message": "Detection results updated successfully"}
 
 
-@router.get("/{image_id}/processed_presigned_url")
+@router.post("/{image_id}/processed_presigned_url")
 async def get_processed_presigned_url(
     image_id: int,
+    info: ProcessedPresignedUrlSchema,
     db: AsyncSession = Depends(get_db)
 ):
     image = await db.get(Image, image_id)
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
     
-    processed_path = f"processed/{image.storage_path.split('/')[-1]}"
-    presigned_url = s3_client.generate_presigned_put_url(processed_path)
+    presigned_url = s3_client.generate_presigned_put_url(info.storage_path, info.content_type, info.expires_in)
     
     return {
         "image_id": image.image_id,
         "presigned_url": presigned_url,
-        "processed_path": processed_path
+        "storage_path": info.storage_path
     }

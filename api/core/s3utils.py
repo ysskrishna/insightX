@@ -56,12 +56,12 @@ class S3Client:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to get presigned GET url: {str(e)}")
     
-    def generate_presigned_put_url(self, object_key: str) -> str:
+    def generate_presigned_put_url(self, object_key: str, content_type: str = 'image/jpeg', expires_in: int = 3600) -> str:
         try:
             url = self.s3_client.generate_presigned_url(
                 'put_object',
-                Params={'Bucket': self.bucket_name, 'Key': object_key},
-                ExpiresIn=3600
+                Params={'Bucket': self.bucket_name, 'Key': object_key, 'ContentType': content_type},
+                ExpiresIn=expires_in
             )
             return url
         except Exception as e:
