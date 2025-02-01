@@ -2,36 +2,39 @@ import json
 import logging
 import aio_pika
 import numpy as np
-import torch
 import aiohttp
 from PIL import Image
 from io import BytesIO
 from nudenet import NudeDetector
 from core.config import Config
 from core.s3utils import s3_client
+from ultralytics import YOLO
 
 logger = logging.getLogger(__name__)
 
-# Initialize YOLO detector
-def load_yolo():
-    model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
-    return model
 
 # Initialize NSFW detector
 nude_detector = NudeDetector()
 
+model = YOLO('yolov8n.pt')
+
 def run_yolo_detection(image):
-    model = load_yolo()
     results = model(image)
+
     detections = []
+    result = results[0]
+    boxes = result.boxes
     
-    for *box, conf, cls in results.xyxy[0]:
+    for box in boxes:
+        cls = int(box.cls[0])
+        conf = float(box.conf[0])
+        xyxy = box.xyxy[0].tolist()  
+
         detections.append({
-            'class': results.names[int(cls)],
-            'confidence': float(conf),
-            'box': box.tolist()
+            'class': result.names[cls],
+            'confidence': conf,
+            'box': xyxy
         })
-    
     return detections
 
 def run_nsfw_detection(image):
