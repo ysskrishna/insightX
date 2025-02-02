@@ -12,13 +12,22 @@ from ultralytics import YOLO
 
 logger = logging.getLogger(__name__)
 
+# Image format configuration
+IMAGE_FORMATS = {
+    'jpg': {'content_type': 'image/jpeg', 'pil_format': 'JPEG'},
+    'jpeg': {'content_type': 'image/jpeg', 'pil_format': 'JPEG'},
+    'png': {'content_type': 'image/png', 'pil_format': 'PNG'},
+    'webp': {'content_type': 'image/webp', 'pil_format': 'WEBP'}
+}
 
 # Initialize NSFW detector
 nude_detector = NudeDetector()
-
 model = YOLO('yolov8n.pt')
 
-PROCESSED_IMAGE_CONTENT_TYPE = 'image/jpeg'
+def get_format_info(image_format: str) -> dict:
+    format_key = image_format.lower()
+    return IMAGE_FORMATS.get(format_key, IMAGE_FORMATS['jpg'])  # Default to JPEG if unknown
+
 
 def run_yolo_detection(image):
     results = model(image)
@@ -89,21 +98,14 @@ def draw_detections(image, detections):
     
     return image
 
-async def upload_image_to_presigned_url(image, presigned_url, content_type):
+async def upload_image_to_presigned_url(image, presigned_url, format_info):
     try:
         img_byte_arr = BytesIO()
-        # Map content type to PIL format
-        format_map = {
-            'image/jpeg': 'JPEG',
-            'image/png': 'PNG',
-            'image/webp': 'WEBP'
-        }
-        save_format = format_map.get(content_type, 'JPEG')  # Default to JPEG if unknown
-        image.save(img_byte_arr, format=save_format)
+        image.save(img_byte_arr, format=format_info.get('pil_format'))
         img_byte_arr = img_byte_arr.getvalue()
         
         headers = {
-            'Content-Type': content_type
+            'Content-Type': format_info.get('content_type')
         }
         async with aiohttp.ClientSession() as session:
             async with session.put(presigned_url, headers=headers, data=img_byte_arr) as response:
@@ -116,25 +118,18 @@ async def upload_image_to_presigned_url(image, presigned_url, content_type):
 
 async def get_processed_presigned_url(image_id: int, original_format: str = 'jpg') -> tuple[str, str]:
     async with aiohttp.ClientSession() as session:
-        # Map common image formats to their content types
-        format_to_content_type = {
-            'jpg': 'image/jpeg',
-            'jpeg': 'image/jpeg',
-            'png': 'image/png',
-            'webp': 'image/webp'
-        }
-        content_type = format_to_content_type.get(original_format.lower(), 'image/jpeg')
+        format_info = get_format_info(original_format)
         
         payload = {
             "storage_path": f"processed/{image_id}/detected.{original_format}",
-            "content_type": content_type,
+            "content_type": format_info.get('content_type'),
             "expires_in": 3600
         }
         async with session.post(f"{Config.API_BASE_URL}/images/{image_id}/processed_presigned_url", json=payload) as response:
             if response.status != 200:
                 raise Exception(f"Failed to get presigned URL: {response.status}")
             presigned_data = await response.json()
-            return presigned_data.get('presigned_url'), presigned_data.get('storage_path'), content_type
+            return presigned_data.get('presigned_url'), presigned_data.get('storage_path'), format_info
 
 async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None:
     async with message.process():
@@ -161,10 +156,10 @@ async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None
             image_with_detections = draw_detections(image, detected_objects)
             
             # Get presigned URL and processed path
-            presigned_url, processed_image_path, content_type = await get_processed_presigned_url(body['image_id'], original_format)
+            presigned_url, processed_image_path, format_info = await get_processed_presigned_url(body['image_id'], original_format)
             
             # Upload image to presigned URL
-            await upload_image_to_presigned_url(image_with_detections, presigned_url, content_type)
+            await upload_image_to_presigned_url(image_with_detections, presigned_url, format_info)
             
             # Update detection results
             await update_detection_results(body['image_id'], detected_objects, nsfw_detections, processed_image_path)
