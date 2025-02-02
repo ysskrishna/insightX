@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Query
 from core.s3utils import s3_client
 from core.dbutils import get_db
 from core import models, schemas
-from core.rabbitmq import rabbitmq_client
+from core.rabbitmq import RabbitMQClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update, select, func
 from services.images import format_image_row
@@ -44,6 +44,7 @@ async def upload_image(
         "image_id": image.image_id,
         "storage_path": image.storage_path
     }
+    rabbitmq_client = RabbitMQClient()
     rabbitmq_client.publish_message(message)
     
     return {
