@@ -89,14 +89,21 @@ def draw_detections(image, detections):
     
     return image
 
-async def upload_image_to_presigned_url(image, presigned_url):
+async def upload_image_to_presigned_url(image, presigned_url, content_type):
     try:
         img_byte_arr = BytesIO()
-        image.save(img_byte_arr, format='JPEG')
+        # Map content type to PIL format
+        format_map = {
+            'image/jpeg': 'JPEG',
+            'image/png': 'PNG',
+            'image/webp': 'WEBP'
+        }
+        save_format = format_map.get(content_type, 'JPEG')  # Default to JPEG if unknown
+        image.save(img_byte_arr, format=save_format)
         img_byte_arr = img_byte_arr.getvalue()
         
         headers = {
-            'Content-Type': 'image/jpeg'
+            'Content-Type': content_type
         }
         async with aiohttp.ClientSession() as session:
             async with session.put(presigned_url, headers=headers, data=img_byte_arr) as response:
@@ -107,19 +114,27 @@ async def upload_image_to_presigned_url(image, presigned_url):
         logger.error(f"Error uploading image to presigned URL: {e}")
         raise
 
-async def get_processed_presigned_url(image_id: int) -> tuple[str, str]:
+async def get_processed_presigned_url(image_id: int, original_format: str = 'jpg') -> tuple[str, str]:
     async with aiohttp.ClientSession() as session:
+        # Map common image formats to their content types
+        format_to_content_type = {
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'webp': 'image/webp'
+        }
+        content_type = format_to_content_type.get(original_format.lower(), 'image/jpeg')
+        
         payload = {
-            "storage_path": f"processed/{image_id}/detected.jpg",
-            "content_type": PROCESSED_IMAGE_CONTENT_TYPE,
+            "storage_path": f"processed/{image_id}/detected.{original_format}",
+            "content_type": content_type,
             "expires_in": 3600
         }
         async with session.post(f"{Config.API_BASE_URL}/images/{image_id}/processed_presigned_url", json=payload) as response:
             if response.status != 200:
                 raise Exception(f"Failed to get presigned URL: {response.status}")
             presigned_data = await response.json()
-            print(presigned_data)
-            return presigned_data.get('presigned_url'), presigned_data.get('storage_path')
+            return presigned_data.get('presigned_url'), presigned_data.get('storage_path'), content_type
 
 async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None:
     async with message.process():
@@ -130,6 +145,9 @@ async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None
             response = s3_client.download_file(body['storage_path'])
             image_data = response['Body'].read()
             image = Image.open(BytesIO(image_data))
+            
+            # Get original format from the image
+            original_format = image.format.lower() if image.format else 'jpg'
             
             # Run NSFW detection
             nsfw_detections = run_nsfw_detection(image)
@@ -143,10 +161,10 @@ async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None
             image_with_detections = draw_detections(image, detected_objects)
             
             # Get presigned URL and processed path
-            presigned_url, processed_image_path = await get_processed_presigned_url(body['image_id'])
+            presigned_url, processed_image_path, content_type = await get_processed_presigned_url(body['image_id'], original_format)
             
             # Upload image to presigned URL
-            await upload_image_to_presigned_url(image_with_detections, presigned_url)
+            await upload_image_to_presigned_url(image_with_detections, presigned_url, content_type)
             
             # Update detection results
             await update_detection_results(body['image_id'], detected_objects, nsfw_detections, processed_image_path)

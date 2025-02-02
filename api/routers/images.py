@@ -11,7 +11,7 @@ router = APIRouter(prefix="/images", tags=["images"])
 
 
 def validate_image_type(file: UploadFile) -> str:
-    ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp']
 
     # Get file extension
     file_ext = "." + file.filename.split(".")[-1].lower()
