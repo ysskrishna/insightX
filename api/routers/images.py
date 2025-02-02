@@ -1,11 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Query
 from core.s3utils import s3_client
 from core.dbutils import get_db
-from core.models import Image
+from core import models, schemas
 from core.rabbitmq import rabbitmq_client
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update
-from core.schemas import ImageDetectionResultSchema, ProcessedPresignedUrlSchema
+from sqlalchemy import update, select, func
+from services.images import format_image_row
 
 router = APIRouter(prefix="/images", tags=["images"])
 
@@ -31,7 +31,7 @@ async def upload_image(
 ):
     validate_image_type(file)
     s3_object_key = s3_client.upload_file(file.file, file.content_type, file.filename)
-    image = Image(
+    image = models.Image(
         name=file.filename,
         storage_path=s3_object_key
     )
@@ -51,19 +51,53 @@ async def upload_image(
         "name": image.name
     }
 
+@router.get("/list")
+async def get_image_list(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+):
+    offset = (page - 1) * limit
+
+    result = await db.execute(select(models.Image).offset(offset).limit(limit))
+    images = result.scalars().all()
+
+    total_result = await db.execute(select(func.count()).select_from(models.Image))
+    total = total_result.scalar()
+
+    return {
+        "page": page,
+        "limit": limit,
+        "total": total,
+        "data": [format_image_row(image) for image in images]
+    }
+
+
+@router.get("/{image_id}")
+async def get_image(
+    image_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    image = await db.get(models.Image, image_id)
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    return format_image_row(image)
+
+
 @router.post("/{image_id}/detection_result")
 async def update_detection_result(
     image_id: int,
-    results: ImageDetectionResultSchema,
+    results: schemas.ImageDetectionResultSchema,
     db: AsyncSession = Depends(get_db)
 ):
-    image = await db.get(Image, image_id)
+    image = await db.get(models.Image, image_id)
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
     
     stmt = (
-        update(Image)
-        .where(Image.image_id == image_id)
+        update(models.Image)
+        .where(models.Image.image_id == image_id)
         .values(
             is_processed=True,
             detected_objects=results.detected_objects,
@@ -82,10 +116,10 @@ async def update_detection_result(
 @router.post("/{image_id}/processed_presigned_url")
 async def get_processed_presigned_url(
     image_id: int,
-    info: ProcessedPresignedUrlSchema,
+    info: schemas.ProcessedPresignedUrlSchema,
     db: AsyncSession = Depends(get_db)
 ):
-    image = await db.get(Image, image_id)
+    image = await db.get(models.Image, image_id)
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
     
