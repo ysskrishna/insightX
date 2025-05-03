@@ -45,6 +45,13 @@ class S3Client:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to upload file: {str(e)}")
     
+    @staticmethod
+    def get_public_s3_url(presigned_url: str) -> str:
+        if presigned_url.startswith(Config.AWS_S3_ENDPOINT_URL):
+            return presigned_url.replace(Config.AWS_S3_ENDPOINT_URL, Config.AWS_S3_ENDPOINT_PUBLIC_URL)
+        return presigned_url
+        
+    
     def generate_presigned_get_url(self, object_key: str) -> str:
         try:
             url = self.s3_client.generate_presigned_url(
