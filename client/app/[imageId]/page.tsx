@@ -12,7 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { formatDate } from "@/lib/utils"
-import { ObjectDetectionViewer } from "@/components/object-detection-viewer"
 
 export default function ImageDetailsPage({ params }: { params: { imageId: string } }) {
   const [image, setImage] = useState<ImageResult | null>(null)
@@ -103,9 +102,11 @@ export default function ImageDetailsPage({ params }: { params: { imageId: string
                   <TabsContent value="processed" className="mt-4">
                     {image.is_processed ? (
                       <div className="relative aspect-video bg-gray-100 rounded-md overflow-hidden">
-                        <ObjectDetectionViewer
-                          imageUrl={image.output_image_url}
-                          detectedObjects={image.detected_objects}
+                        <Image
+                          src={image.output_image_url}
+                          alt={image.name}
+                          fill
+                          className="object-contain"
                         />
                       </div>
                     ) : (

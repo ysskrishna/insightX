@@ -7,17 +7,7 @@ import type { ImageResult } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { ImageDetailsModal } from "@/components/image-details-modal"
 import { formatDate, truncateText } from "@/lib/utils"
 import { ArrowUpDown, Eye, MoreHorizontal, Trash2 } from "lucide-react"
 
@@ -31,9 +21,6 @@ interface ResultsTableProps {
 }
 
 export function ResultsTable({ images, onSort, sortConfig }: ResultsTableProps) {
-  const [selectedImage, setSelectedImage] = useState<ImageResult | null>(null)
-  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
-
   const renderSortIcon = (field: keyof ImageResult) => {
     if (sortConfig.field !== field) {
       return <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -137,8 +124,6 @@ export function ResultsTable({ images, onSort, sortConfig }: ResultsTableProps) 
           </TableBody>
         </Table>
       </div>
-
-      {selectedImage && <ImageDetailsModal image={selectedImage} onClose={() => setSelectedImage(null)} />}
     </>
   )
 }
