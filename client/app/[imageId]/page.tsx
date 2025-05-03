@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { fetchImageById } from "@/lib/api"
 import type { ImageResult } from "@/lib/types"
-import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -46,22 +45,17 @@ export default function ImageDetailsPage({ params }: { params: { imageId: string
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <Header />
         <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="flex flex-col items-center">
             <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
             <p className="text-lg">Loading image details...</p>
           </div>
         </main>
-      </div>
     )
   }
 
   if (!image) {
     return (
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <Header />
         <main className="flex-1 container mx-auto px-4 py-8">
           <Button variant="ghost" onClick={() => router.back()} className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to images
@@ -77,13 +71,10 @@ export default function ImageDetailsPage({ params }: { params: { imageId: string
             </CardContent>
           </Card>
         </main>
-      </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <Button variant="ghost" onClick={() => router.back()} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to images
@@ -212,6 +203,5 @@ export default function ImageDetailsPage({ params }: { params: { imageId: string
           </div>
         </div>
       </main>
-    </div>
   )
 }

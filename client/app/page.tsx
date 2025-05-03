@@ -52,23 +52,6 @@ export default function Home() {
     })
   }
 
-  const handleDelete = async (imageId: number) => {
-    try {
-      await deleteImage(imageId)
-      toast({
-        title: "Success",
-        description: "Image deleted successfully.",
-      })
-      loadImages()
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete image. Please try again.",
-        variant: "destructive",
-      })
-    }
-  }
-
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
   }
@@ -120,7 +103,7 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <ResultsTable images={sortedImages} onDelete={handleDelete} onSort={handleSort} sortConfig={sortBy} />
+              <ResultsTable images={sortedImages} onSort={handleSort} sortConfig={sortBy} />
 
               <div className="mt-6">
                 <Pagination

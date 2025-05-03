@@ -23,7 +23,6 @@ import { ArrowUpDown, Eye, MoreHorizontal, Trash2 } from "lucide-react"
 
 interface ResultsTableProps {
   images: ImageResult[]
-  onDelete: (imageId: number) => Promise<void>
   onSort: (field: keyof ImageResult) => void
   sortConfig: {
     field: keyof ImageResult | null
@@ -31,14 +30,9 @@ interface ResultsTableProps {
   }
 }
 
-export function ResultsTable({ images, onDelete, onSort, sortConfig }: ResultsTableProps) {
+export function ResultsTable({ images, onSort, sortConfig }: ResultsTableProps) {
   const [selectedImage, setSelectedImage] = useState<ImageResult | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
-
-  const handleDelete = async (imageId: number) => {
-    await onDelete(imageId)
-    setDeleteConfirm(null)
-  }
 
   const renderSortIcon = (field: keyof ImageResult) => {
     if (sortConfig.field !== field) {
@@ -136,26 +130,6 @@ export function ResultsTable({ images, onDelete, onSort, sortConfig }: ResultsTa
                         <span className="sr-only">View details</span>
                       </Button>
                     </Link>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/${image.image_id}`}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View details
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setDeleteConfirm(image.image_id)}>
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 </TableCell>
               </TableRow>
@@ -165,30 +139,6 @@ export function ResultsTable({ images, onDelete, onSort, sortConfig }: ResultsTa
       </div>
 
       {selectedImage && <ImageDetailsModal image={selectedImage} onClose={() => setSelectedImage(null)} />}
-
-      <Dialog
-        open={deleteConfirm !== null}
-        onOpenChange={(open) => {
-          if (!open) setDeleteConfirm(null)
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Image</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this image? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={() => deleteConfirm && handleDelete(deleteConfirm)}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   )
 }
