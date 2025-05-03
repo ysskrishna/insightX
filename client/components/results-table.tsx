@@ -1,6 +1,3 @@
-"use client"
-
-import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import type { ImageResult } from "@/lib/types"
@@ -9,25 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatDate, truncateText } from "@/lib/utils"
-import { ArrowUpDown, Eye, MoreHorizontal, Trash2 } from "lucide-react"
+import { Eye } from "lucide-react"
 
 interface ResultsTableProps {
   images: ImageResult[]
-  onSort: (field: keyof ImageResult) => void
-  sortConfig: {
-    field: keyof ImageResult | null
-    direction: "asc" | "desc"
-  }
 }
 
-export function ResultsTable({ images, onSort, sortConfig }: ResultsTableProps) {
-  const renderSortIcon = (field: keyof ImageResult) => {
-    if (sortConfig.field !== field) {
-      return <ArrowUpDown className="ml-2 h-4 w-4" />
-    }
-    return <ArrowUpDown className={`ml-2 h-4 w-4 ${sortConfig.field === field ? "text-primary" : ""}`} />
-  }
-
+export function ResultsTable({ images }: ResultsTableProps) {
   if (images.length === 0) {
     return (
       <Card className="p-8 text-center">
@@ -44,34 +29,10 @@ export function ResultsTable({ images, onSort, sortConfig }: ResultsTableProps) 
           <TableHeader>
             <TableRow>
               <TableHead className="w-[80px]">Image</TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => onSort("name")}
-                  className="font-medium flex items-center p-0 h-auto"
-                >
-                  Name {renderSortIcon("name")}
-                </Button>
-              </TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => onSort("is_processed")}
-                  className="font-medium flex items-center p-0 h-auto"
-                >
-                  Status {renderSortIcon("is_processed")}
-                </Button>
-              </TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>Objects</TableHead>
-              <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => onSort("created_at")}
-                  className="font-medium flex items-center p-0 h-auto"
-                >
-                  Date {renderSortIcon("created_at")}
-                </Button>
-              </TableHead>
+              <TableHead>Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>

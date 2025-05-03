@@ -56,14 +56,23 @@ async def upload_image(
 async def get_image_list(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
+    search: str = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     offset = (page - 1) * limit
 
-    result = await db.execute(select(models.Image).offset(offset).limit(limit))
+    query = select(models.Image)
+    if search:
+        query = query.where(models.Image.name.ilike(f"%{search}%"))
+    
+    query = query.offset(offset).limit(limit)
+    result = await db.execute(query)
     images = result.scalars().all()
 
-    total_result = await db.execute(select(func.count()).select_from(models.Image))
+    count_query = select(func.count()).select_from(models.Image)
+    if search:
+        count_query = count_query.where(models.Image.name.ilike(f"%{search}%"))
+    total_result = await db.execute(count_query)
     total = total_result.scalar()
 
     return {
