@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Header } from "@/components/header"
 import { UploadZone } from "@/components/upload-zone"
 import { ResultsTable } from "@/components/results-table"
 import { Pagination } from "@/components/pagination"
@@ -104,8 +103,6 @@ export default function Home() {
   })
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <section className="mb-8">
           <UploadZone onUploadSuccess={handleUploadSuccess} />
@@ -139,6 +136,5 @@ export default function Home() {
           )}
         </section>
       </main>
-    </div>
   )
 }

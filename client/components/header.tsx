@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { ImageIcon } from "lucide-react"
+import Image from "next/image"
+
 
 export function Header() {
   return (
@@ -7,15 +8,18 @@ export function Header() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <ImageIcon className="h-8 w-8 text-primary" />
+            <Image 
+              src="/logo.png"
+              alt="InsightX Logo"
+              width={32}
+              height={32}
+              className="text-primary"
+            />
             <span className="text-xl font-bold">InsightX</span>
           </Link>
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
-              Dashboard
-            </Link>
             <Link
-              href="https://github.com/your-username/insightx"
+              href="https://github.com/ysskrishna"
               className="text-sm font-medium hover:text-primary transition-colors"
             >
               Documentation
