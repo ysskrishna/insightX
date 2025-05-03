@@ -3,7 +3,7 @@ services:
     build:
       context: ./api
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:dbpassword@db:5432/media_detect
+      - DATABASE_URL=postgresql+asyncpg://postgres:dbpassword@db:5432/insightx
       - AWS_S3_ENDPOINT_URL=http://storage:9000
       - RABBITMQ_HOST=rabbitmq
     ports:
@@ -70,7 +70,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=dbpassword
-      - POSTGRES_DB=media_detect
+      - POSTGRES_DB=insightx
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
