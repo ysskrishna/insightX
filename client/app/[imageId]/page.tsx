@@ -9,16 +9,33 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Loader2 } from "lucide-react"
+import { ArrowLeft, Loader2, RefreshCw } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { formatDate } from "@/lib/utils"
 
 export default function ImageDetailsPage({ params }: { params: { imageId: string } }) {
   const [image, setImage] = useState<ImageResult | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
   const imageId = Number.parseInt(params.imageId)
+
+  const handleRefresh = async () => {
+    try {
+      setRefreshing(true)
+      const data = await fetchImageById(imageId)
+      setImage(data)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to refresh image details. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   useEffect(() => {
     const loadImage = async () => {
@@ -85,7 +102,17 @@ export default function ImageDetailsPage({ params }: { params: { imageId: string
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-xl">Image Details</CardTitle>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={handleRefresh}
+                      disabled={refreshing}
+                    >
+                      <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                      <span className="sr-only">Refresh details</span>
+                    </Button>
                     <Badge variant={image.is_processed ? "success" : "secondary"}>
                       {image.is_processed ? "Processed" : "Processing"}
                     </Badge>
