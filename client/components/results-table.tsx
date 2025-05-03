@@ -1,18 +1,54 @@
 import Link from "next/link"
 import Image from "next/image"
+import { useState } from "react"
 import type { ImageResult } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatDate, truncateText } from "@/lib/utils"
-import { Eye } from "lucide-react"
+import { Eye, RefreshCw } from "lucide-react"
+import { fetchImageById } from "@/lib/api"
+import { useToast } from "@/hooks/use-toast"
 
 interface ResultsTableProps {
   images: ImageResult[]
+  onImageUpdate?: (updatedImage: ImageResult) => void
+  onSort?: (field: keyof ImageResult) => void
+  sortConfig?: {
+    field: keyof ImageResult | null
+    direction: "asc" | "desc"
+  }
 }
 
-export function ResultsTable({ images }: ResultsTableProps) {
+export function ResultsTable({ images, onImageUpdate, onSort, sortConfig }: ResultsTableProps) {
+  const [refreshingIds, setRefreshingIds] = useState<Set<number>>(new Set())
+  const { toast } = useToast()
+
+  const handleRefresh = async (imageId: number) => {
+    try {
+      setRefreshingIds(prev => new Set(prev).add(imageId))
+      const updatedImage = await fetchImageById(imageId)
+      onImageUpdate?.(updatedImage)
+      toast({
+        title: "Success",
+        description: "Image details refreshed successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to refresh image details. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setRefreshingIds(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(imageId)
+        return newSet
+      })
+    }
+  }
+
   if (images.length === 0) {
     return (
       <Card className="p-8 text-center">
@@ -31,7 +67,7 @@ export function ResultsTable({ images }: ResultsTableProps) {
               <TableHead className="w-[80px]">Image</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Objects</TableHead>
+              <TableHead># Objects</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -71,7 +107,17 @@ export function ResultsTable({ images }: ResultsTableProps) {
                 </TableCell>
                 <TableCell>{formatDate(image.created_at)}</TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => handleRefresh(image.image_id)}
+                      disabled={refreshingIds.has(image.image_id)}
+                    >
+                      <RefreshCw className={`h-4 w-4 ${refreshingIds.has(image.image_id) ? 'animate-spin' : ''}`} />
+                      <span className="sr-only">Refresh details</span>
+                    </Button>
                     <Link href={`/${image.image_id}`}>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <Eye className="h-4 w-4" />

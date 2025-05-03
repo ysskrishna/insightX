@@ -5,7 +5,7 @@ import { UploadZone } from "@/components/upload-zone"
 import { ResultsTable } from "@/components/results-table"
 import { Pagination } from "@/components/pagination"
 import { SearchFilter } from "@/components/search-filter"
-import { fetchImages, deleteImage } from "@/lib/api"
+import { fetchImages } from "@/lib/api"
 import type { ImageResult } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
@@ -103,7 +103,18 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <ResultsTable images={sortedImages} onSort={handleSort} sortConfig={sortBy} />
+              <ResultsTable 
+                images={sortedImages} 
+                onSort={handleSort} 
+                sortConfig={sortBy}
+                onImageUpdate={(updatedImage) => {
+                  setImages(prevImages => 
+                    prevImages.map(img => 
+                      img.image_id === updatedImage.image_id ? updatedImage : img
+                    )
+                  )
+                }}
+              />
 
               <div className="mt-6">
                 <Pagination
