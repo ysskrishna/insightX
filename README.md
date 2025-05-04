@@ -10,6 +10,7 @@ InsightX is a distributed system that provides real-time image analysis with the
 - **Object Detection**: Real-time object detection with bounding boxes using YOLOv8
 - **Visual Insights**: Detailed analysis of image contents with confidence scores
 - **Modern UI**: Clean and intuitive interface for viewing and managing image analysis results
+- **Flexible Storage**: MinIO for local development and AWS S3 for production environments
 
 ## Key Features
 
@@ -70,6 +71,7 @@ docker-compose up -d
 - FastAPI-based backend service
 - Handles image uploads and analysis requests
 - Manages detection results and storage
+- Supports both MinIO, AWS S3 for image storage
 - Located in `api/` directory
 - See [API README](api/README.md) for detailed setup instructions
 
@@ -77,6 +79,7 @@ docker-compose up -d
 - Background processing service for image analysis
 - Implements YOLOv8 and NudeNet models
 - Generates annotated images with detection results
+- Supports both MinIO, AWS S3 for image storage
 - Located in `worker/` directory
 - See [Worker README](worker/README.md) for detailed setup instructions
 

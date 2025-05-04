@@ -9,7 +9,7 @@ The backend API service for InsightX, built with FastAPI and Python.
 - **Database**: PostgreSQL
 - **ORM**: SQLAlchemy
 - **Message Queue**: RabbitMQ (via aio-pika)
-- **Storage**: AWS S3 (via boto3)
+- **Storage**: MinIO and AWS S3 via boto3
 - **Documentation**: OpenAPI/Swagger
 
 ## Getting Started
@@ -19,6 +19,7 @@ The backend API service for InsightX, built with FastAPI and Python.
 - Python 3.8 or later
 - PostgreSQL
 - RabbitMQ
+- MinIO or AWS S3
 - pip
 
 ### Installation

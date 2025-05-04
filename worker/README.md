@@ -7,7 +7,7 @@ The background processing service for InsightX, handling image analysis and comp
 - **Framework**: Python
 - **Message Queue**: RabbitMQ (via aio-pika)
 - **ML Framework**: YOLOv8
-- **Storage**: AWS S3 (via boto3)
+- **Storage**: MinIO and AWS S3 via boto3
 - **Data Processing**: Pandas, NumPy
 - **Image Processing**: OpenCV
 
@@ -17,6 +17,7 @@ The background processing service for InsightX, handling image analysis and comp
 
 - Python 3.8 or later
 - RabbitMQ
+- MinIO or AWS S3
 - pip
 
 ### Installation
