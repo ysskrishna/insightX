@@ -11,7 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Loader2, RefreshCw } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { formatDate } from "@/lib/utils"
+import { formatDate, getObjectBadges } from "@/lib/utils"
+import { ObjectBadge } from "@/components/object-badge"
 
 export default function ImageDetailsPage({ params }: { params: { imageId: string } }) {
   const [image, setImage] = useState<ImageResult | null>(null)
@@ -193,16 +194,15 @@ export default function ImageDetailsPage({ params }: { params: { imageId: string
               </CardHeader>
               <CardContent>
                 {image.detected_objects.length > 0 ? (
-                  <ul className="space-y-3">
-                    {image.detected_objects.map((object, index) => (
-                      <li key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                        <span className="font-medium capitalize">{object.class}</span>
-                        <Badge variant="outline" className="bg-white">
-                          {Math.round(object.confidence * 100)}%
-                        </Badge>
-                      </li>
+                  <div className="flex flex-wrap gap-2">
+                    {getObjectBadges(image.detected_objects).map(({ title, count }) => (
+                      <ObjectBadge
+                        key={title}
+                        title={title}
+                        count={count}
+                      />
                     ))}
-                  </ul>
+                  </div>
                 ) : (
                   <p className="text-sm text-gray-500">No objects detected</p>
                 )}

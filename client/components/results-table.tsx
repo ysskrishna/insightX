@@ -6,10 +6,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { formatDate, truncateText } from "@/lib/utils"
+import { formatDate, truncateText, getObjectBadges } from "@/lib/utils"
 import { Eye, RefreshCw } from "lucide-react"
 import { fetchImageById } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
+import { ObjectBadge } from "@/components/object-badge"
 
 interface ResultsTableProps {
   images: ImageResult[]
@@ -67,7 +68,7 @@ export function ResultsTable({ images, onImageUpdate, onSort, sortConfig }: Resu
               <TableHead className="w-[80px]">Image</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead># Objects</TableHead>
+              <TableHead>Objects</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -100,9 +101,17 @@ export function ResultsTable({ images, onImageUpdate, onSort, sortConfig }: Resu
                 </TableCell>
                 <TableCell>
                   {image.is_processed ? (
-                    <span>{image.detected_objects.length} objects</span>
+                    <div className="flex flex-wrap gap-2">
+                      {getObjectBadges(image.detected_objects).map(({ title, count }) => (
+                        <ObjectBadge
+                          key={title}
+                          title={title}
+                          count={count}
+                        />
+                      ))}
+                    </div>
                   ) : (
-                    <span className="text-gray-500">-</span>
+                    <div className="text-gray-400 text-sm">-</div>
                   )}
                 </TableCell>
                 <TableCell>{formatDate(image.created_at)}</TableCell>
