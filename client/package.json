@@ -10,6 +10,21 @@
     "type": "git",
     "url": "https://github.com/ysskrishna/insightx"
   },
+  "keywords": [
+    "image-analysis",
+    "computer-vision",
+    "nextjs",
+    "typescript",
+    "react",
+    "tailwindcss",
+    "radix-ui",
+    "dashboard",
+    "analytics",
+    "real-time",
+    "docker",
+    "insightx",
+    "ysskrishna"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",

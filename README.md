@@ -64,21 +64,21 @@ docker-compose up -d
 - Modern UI components using shadcn/ui
 - Real-time image analysis results display
 - Located in `client/` directory
-- See `client/README.md` for detailed setup instructions
+- See [Client README](client/README.md) for detailed setup instructions
 
 ### API
 - FastAPI-based backend service
 - Handles image uploads and analysis requests
 - Manages detection results and storage
 - Located in `api/` directory
-- See `api/README.md` for detailed setup instructions
+- See [API README](api/README.md) for detailed setup instructions
 
 ### Worker
 - Background processing service for image analysis
 - Implements YOLOv8 and NudeNet models
 - Generates annotated images with detection results
 - Located in `worker/` directory
-- See `worker/README.md` for detailed setup instructions
+- See [Worker README](worker/README.md) for detailed setup instructions
 
 ## Contributing
 
