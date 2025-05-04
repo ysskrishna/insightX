@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { UploadZone } from "@/components/upload-zone"
-import { ResultsTable } from "@/components/results-table"
+import { ImageResults } from "@/components/image-results"
 import { Pagination } from "@/components/pagination"
 import { SearchFilter } from "@/components/search-filter"
 import { fetchImages } from "@/lib/api"
@@ -131,7 +131,7 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <ResultsTable 
+              <ImageResults 
                 images={sortedImages} 
                 onSort={handleSort} 
                 sortConfig={sortBy}
