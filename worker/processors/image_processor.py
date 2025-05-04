@@ -3,7 +3,7 @@ import logging
 import aio_pika
 import numpy as np
 import aiohttp
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from nudenet import NudeDetector
 from core.config import Config
@@ -84,17 +84,55 @@ async def update_detection_results(image_id, detected_objects, nsfw_detections, 
 def draw_detections(image, detections):
     draw = ImageDraw.Draw(image)
     
+    # Calculate relative sizes based on image dimensions
+    img_width, img_height = image.size
+    box_width = max(2, int(img_width * 0.002))  # 0.2% of image width, minimum 2px
+    font_size = max(12, int(img_width * 0.02))  # 2% of image width, minimum 12px
+    
+    # Calculate padding relative to image size
+    padding = max(5, int(img_width * 0.005))  # 0.5% of image width, minimum 5px
+    text_padding = max(3, int(img_width * 0.003))  # 0.3% of image width, minimum 3px
+    
+    # Create font with relative size
+    try:
+        font = ImageFont.truetype("arial.ttf", font_size)
+    except:
+        font = None  # Fallback to default font if arial.ttf is not available
+    
     for detection in detections:
         box = detection['box']
         label = detection['class']
         conf = detection['confidence']
         
-        # Draw rectangle
-        draw.rectangle(box, outline='red', width=2)
+        # Add padding to box coordinates while ensuring they stay within image boundaries
+        x1 = max(0, min(box[0] - padding, img_width))
+        y1 = max(0, min(box[1] - padding, img_height))
+        x2 = max(0, min(box[2] + padding, img_width))
+        y2 = max(0, min(box[3] + padding, img_height))
         
-        # Draw label
+        # Draw rectangle
+        draw.rectangle([x1, y1, x2, y2], outline='green', width=box_width)
+        
+        # Draw label with relative positioning and padding
         text = f"{label} {conf:.2f}"
-        draw.text((box[0], box[1] - 10), text, fill='red')
+        text_y_offset = max(10, int(img_height * 0.01))  # 1% of image height, minimum 10px
+        
+        # Calculate text position to ensure it stays within image
+        text_x = x1 + text_padding
+        text_y = max(text_y_offset, y1 - text_y_offset)  # Ensure text doesn't go above image
+        
+        # If text would go below image, place it inside the box with padding
+        if text_y + font_size > img_height:
+            text_y = y1 + box_width + text_padding
+        
+        # Draw text with background for better visibility
+        text_bbox = draw.textbbox((text_x, text_y), text, font=font)
+        draw.rectangle(
+            [text_bbox[0] - text_padding, text_bbox[1] - text_padding,
+             text_bbox[2] + text_padding, text_bbox[3] + text_padding],
+            fill='green'
+        )
+        draw.text((text_x, text_y), text, fill='white', font=font)
     
     return image
 
