@@ -6,15 +6,15 @@ export function Footer() {
   return (
     <footer className="border-t">
       <div className="container mx-auto px-4 py-4">
-        <nav className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <nav className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full flex flex-col items-center gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-4">
             <Link
               href="/"
               title={config?.product?.name}
               prefetch={false}
               className="flex items-center space-x-2 group"
             >
-              <div className="relative w-8 h-8 transition-transform duration-300 group-hover:scale-110">
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 transition-transform duration-300 group-hover:scale-110">
                 <img src="/logo.png" alt="Logo" className="w-full h-full object-contain transition-all duration-300 dark:invert" />
               </div>
               <span className="text-2xl font-bold">
@@ -23,7 +23,7 @@ export function Footer() {
             </Link>
           </div>
 
-          <div className="text-start sm:text-center">
+          <div className="w-full flex justify-center sm:w-auto sm:justify-center">
             <Link
               href={config?.author?.github}
               className="text flex items-center gap-2 sm:justify-center"
@@ -32,8 +32,8 @@ export function Footer() {
             </Link>
           </div>
 
-          <div className="flex flex-col items-start gap-2 sm:items-start">
-            <div className="flex items-center gap-x-4">
+          <div className="w-full flex justify-center sm:w-auto sm:justify-end">
+            <div className="flex items-center gap-x-4 sm:gap-x-4">
               <Link
                 href={config?.author?.url}
                 prefetch={false}
@@ -42,7 +42,7 @@ export function Footer() {
                 rel="noopener noreferrer nofollow"
                 aria-label="Website"
               >
-                <FaGlobe className="h-5 w-5 text-black dark:text-white" />
+                <FaGlobe className="h-5 w-5 sm:h-5 sm:w-5 text-black dark:text-white" />
               </Link>
               <Link
                 href={config?.author?.linkedin}
@@ -52,7 +52,7 @@ export function Footer() {
                 rel="noopener noreferrer nofollow"
                 aria-label="LinkedIn"
               >
-                <FaLinkedin className="h-5 w-5 text-black dark:text-white" />
+                <FaLinkedin className="h-5 w-5 sm:h-5 sm:w-5 text-black dark:text-white" />
               </Link>
               <Link
                 href={config?.author?.github}
@@ -62,7 +62,7 @@ export function Footer() {
                 rel="noopener noreferrer nofollow"
                 aria-label="GitHub"
               >
-                <FaGithub className="h-5 w-5 text-black dark:text-white" />
+                <FaGithub className="h-5 w-5 sm:h-5 sm:w-5 text-black dark:text-white" />
               </Link>
               <Link
                 href={config?.author?.productHunt}
@@ -72,7 +72,7 @@ export function Footer() {
                 rel="noopener noreferrer nofollow"
                 aria-label="Product Hunt"
               >
-                <FaProductHunt className="h-5 w-5 text-black dark:text-white" />
+                <FaProductHunt className="h-5 w-5 sm:h-5 sm:w-5 text-black dark:text-white" />
               </Link>
             </div>
           </div>
