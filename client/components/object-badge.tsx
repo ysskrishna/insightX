@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 
 interface ObjectBadgeProps {
   title: string
-  count: number
+  count?: number
   className?: string
 }
 
@@ -15,9 +15,11 @@ export function ObjectBadge({ title, count, className }: ObjectBadgeProps) {
       )}
     >
       <span className="capitalize text-black">{title}</span>
-      <span className="flex items-center justify-center bg-black text-white rounded-full w-5 h-5 text-xs font-bold">
-        {count}
-      </span>
+      {count && (
+        <span className="flex items-center justify-center bg-black text-white rounded-full w-5 h-5 text-xs font-bold">
+          {count}
+        </span>
+      )}
     </div>
   )
 } 

@@ -214,16 +214,14 @@ export default function ImageDetailsPage({ params }: { params: { imageId: string
                   <CardTitle className="text-xl">NSFW Detection</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-3">
-                    {image.detected_nsfw.map((item: any, index: number) => (
-                      <li key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                        <span className="font-medium capitalize">{item.class}</span>
-                        <Badge variant="outline" className="bg-white">
-                          {Math.round(item.confidence * 100)}%
-                        </Badge>
-                      </li>
+                  <div className="flex flex-wrap gap-2">
+                    {image.detected_nsfw.map((item: any) => (
+                      <ObjectBadge
+                        key={item.class}
+                        title={item.class}
+                      />
                     ))}
-                  </ul>
+                  </div>             
                 </CardContent>
               </Card>
             )}
