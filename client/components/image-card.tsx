@@ -30,13 +30,15 @@ export function ImageCard({ image, onRefresh, isRefreshing }: ImageCardProps) {
       </div>
       {/* Card Content */}
       <div className="flex flex-col flex-1 p-5 gap-3">
-        {/* Title */}
-        <div className="font-extrabold text-xl leading-tight break-all mb-1">{truncateText(image.name, 40)}</div>
-        <div className="flex flex-row items-center gap-2 mb-2">
-          {image.is_nsfw && (
-            <Badge variant="destructive">NSFW</Badge>
-          )}
-          <ProcessingStatusBadge isProcessed={image.is_processed} />
+        {/* Title and Badges in same row */}
+        <div className="flex justify-between items-center mb-2">
+          <div className="font-bold text-lg leading-tight break-all">{truncateText(image.name, 25)}</div>
+          <div className="flex flex-row items-center gap-2">
+            {image.is_nsfw && (
+              <Badge variant="destructive">NSFW</Badge>
+            )}
+            <ProcessingStatusBadge isProcessed={image.is_processed} />
+          </div>
         </div>
         {/* Object Badges */}
         {image.is_processed ? (
