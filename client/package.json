@@ -2,6 +2,14 @@
   "name": "insightx-client",
   "version": "1.0.0",
   "private": true,
+  "author": {
+    "name": "ysskrishna",
+    "url": "https://github.com/ysskrishna"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ysskrishna/insightx"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

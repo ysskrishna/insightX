@@ -9,7 +9,8 @@ const config = {
     },
     product: {
         name: "InsightX",
-        description: "Modern image analysis and object detection platform"
+        description: "Modern image analysis and object detection platform",
+        github: "https://github.com/ysskrishna/insightx",
     }
 };
 

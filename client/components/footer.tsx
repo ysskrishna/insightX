@@ -8,19 +8,19 @@ export function Footer() {
       <div className="container mx-auto px-4 py-4">
         <nav className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div>
             <Link
               href="/"
               title={config?.product?.name}
               prefetch={false}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 group"
             >
-              <img src="/logo.png" alt="Logo" className="h-8 w-8 transition-all duration-300 dark:invert" />
+              <div className="relative w-8 h-8 transition-transform duration-300 group-hover:scale-110">
+                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain transition-all duration-300 dark:invert" />
+              </div>
               <span className="text-2xl font-bold">
                 {config?.product?.name}
               </span>
             </Link>
-          </div>
           </div>
 
           <div className="text-start sm:text-center">
