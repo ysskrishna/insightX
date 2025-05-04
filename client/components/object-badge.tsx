@@ -10,12 +10,12 @@ export function ObjectBadge({ title, count, className }: ObjectBadgeProps) {
   return (
     <div
       className={cn(
-        "flex items-center rounded-full bg-white border border-gray-200 px-2 py-0.5 text-xs font-medium text-gray-700 shadow-sm gap-2",
+        "flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-black gap-2",
         className
       )}
     >
-      <span className="capitalize">{title}</span>
-      <span className="flex items-center justify-center bg-blue-500 text-white rounded-full w-5 h-5 text-xs font-bold border-2 border-white shadow">
+      <span className="capitalize text-black">{title}</span>
+      <span className="flex items-center justify-center bg-black text-white rounded-full w-5 h-5 text-xs font-bold">
         {count}
       </span>
     </div>

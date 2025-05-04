@@ -95,9 +95,14 @@ export function ResultsTable({ images, onImageUpdate, onSort, sortConfig }: Resu
                   )}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={image.is_processed ? "success" : "secondary"}>
-                    {image.is_processed ? "Processed" : "Processing"}
-                  </Badge>
+                  {image.is_processed ? (
+                    <Badge className="bg-black text-white font-semibold rounded px-2 py-1">Processed</Badge>
+                  ) : (
+                    <Badge className="bg-gray-700 text-white font-semibold rounded px-2 py-1 flex items-center gap-1">
+                      <span>Processing</span>
+                      <span className="animate-pulse text-white">•</span>
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                   {image.is_processed ? (
