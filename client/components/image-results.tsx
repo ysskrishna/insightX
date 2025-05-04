@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { formatDate, truncateText, getObjectBadges } from "@/lib/utils"
+import { getRelativeTime, truncateText, getObjectBadges } from "@/lib/utils"
 import { Eye, RefreshCw } from "lucide-react"
 import { fetchImageById } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
@@ -100,7 +100,7 @@ export function ImageResults({ images, onImageUpdate, onSort, sortConfig, viewMo
                 <TableCell>
                   <div className="relative h-10 w-10 rounded-md overflow-hidden bg-gray-100">
                     <Image
-                      src={image.input_image_url || "/placeholder.svg"}
+                      src={image.input_image_url || "/placeholder.png"}
                       alt={image.name}
                       fill
                       className="object-cover"
@@ -133,7 +133,7 @@ export function ImageResults({ images, onImageUpdate, onSort, sortConfig, viewMo
                     <div className="text-gray-400 text-sm">-</div>
                   )}
                 </TableCell>
-                <TableCell>{formatDate(image.created_at)}</TableCell>
+                <TableCell>{getRelativeTime(image.created_at)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button

@@ -21,7 +21,7 @@ export function ImageCard({ image, onRefresh, isRefreshing }: ImageCardProps) {
       {/* Image at the top */}
       <div className="relative w-full h-48 bg-gray-100">
         <Image
-          src={image.input_image_url || "/placeholder.svg"}
+          src={image.input_image_url || "/placeholder.png"}
           alt={image.name}
           fill
           className="object-cover w-full h-full rounded-t-lg"

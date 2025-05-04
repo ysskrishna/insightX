@@ -148,7 +148,7 @@ export default function ImageDetailsPage({ params }: { params: { imageId: string
                   <TabsContent value="original" className="mt-4">
                     <div className="relative aspect-video bg-gray-100 rounded-md overflow-hidden">
                       <Image
-                        src={image.input_image_url || "/placeholder.svg"}
+                        src={image.input_image_url || "/placeholder.png"}
                         alt={image.name}
                         fill
                         className="object-contain"
