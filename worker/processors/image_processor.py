@@ -86,18 +86,17 @@ def draw_detections(image, detections):
     
     # Calculate relative sizes based on image dimensions
     img_width, img_height = image.size
-    box_width = max(2, int(img_width * 0.002))  # 0.2% of image width, minimum 2px
-    font_size = max(12, int(img_width * 0.02))  # 2% of image width, minimum 12px
-    
-    # Calculate padding relative to image size
-    padding = max(5, int(img_width * 0.005))  # 0.5% of image width, minimum 5px
-    text_padding = max(3, int(img_width * 0.003))  # 0.3% of image width, minimum 3px
+    # Set min and max for box width, font size, and paddings
+    box_width = min(6, max(1, int(img_width * 0.002)))  # 0.2% of image width, min 1px, max 6px
+    font_size = min(24, max(6, int(img_width * 0.02)))  # 2% of image width, min 6px, max 24px
+    padding = min(10, max(1, int(img_width * 0.005)))   # 0.5% of image width, min 1px, max 10px
+    text_padding = min(6, max(1, int(img_width * 0.003)))  # 0.3% of image width, min 1px, max 6px
     
     # Create font with relative size
     try:
         font = ImageFont.truetype("arial.ttf", font_size)
     except:
-        font = None  # Fallback to default font if arial.ttf is not available
+        font = ImageFont.load_default()  # Fallback to default font if arial.ttf is not available
     
     for detection in detections:
         box = detection['box']
@@ -115,7 +114,7 @@ def draw_detections(image, detections):
         
         # Draw label with relative positioning and padding
         text = f"{label} {conf:.2f}"
-        text_y_offset = max(10, int(img_height * 0.01))  # 1% of image height, minimum 10px
+        text_y_offset = min(20, max(4, int(img_height * 0.01)))  # 1% of image height, min 4px, max 20px
         
         # Calculate text position to ensure it stays within image
         text_x = x1 + text_padding
@@ -126,7 +125,10 @@ def draw_detections(image, detections):
             text_y = y1 + box_width + text_padding
         
         # Draw text with background for better visibility
-        text_bbox = draw.textbbox((text_x, text_y), text, font=font)
+        if font is not None:
+            text_bbox = draw.textbbox((text_x, text_y), text, font=font)
+        else:
+            text_bbox = draw.textbbox((text_x, text_y), text)
         draw.rectangle(
             [text_bbox[0] - text_padding, text_bbox[1] - text_padding,
              text_bbox[2] + text_padding, text_bbox[3] + text_padding],
