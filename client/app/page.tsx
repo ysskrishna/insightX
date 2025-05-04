@@ -9,6 +9,8 @@ import { fetchImages } from "@/lib/api"
 import type { ImageResult } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   const [images, setImages] = useState<ImageResult[]>([])
@@ -22,6 +24,8 @@ export default function Home() {
     direction: "asc" | "desc"
   }>({ field: "created_at", direction: "desc" })
   const { toast } = useToast()
+  const isMobile = useIsMobile()
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
 
   const loadImages = async () => {
     try {
@@ -96,6 +100,30 @@ export default function Home() {
             <SearchFilter onSearch={handleSearch} />
           </div>
 
+          {/* Toggle for desktop only */}
+          {!isMobile && (
+            <div className="flex justify-end mb-4">
+              <div className="inline-flex rounded-md shadow-sm border border-gray-200 bg-gray-50">
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={viewMode === 'table' ? 'rounded-l-md' : 'rounded-l-md'}
+                  onClick={() => setViewMode('table')}
+                >
+                  Table View
+                </Button>
+                <Button
+                  variant={viewMode === 'card' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={viewMode === 'card' ? 'rounded-r-md' : 'rounded-r-md'}
+                  onClick={() => setViewMode('card')}
+                >
+                  Card View
+                </Button>
+              </div>
+            </div>
+          )}
+
           {loading ? (
             <div className="flex justify-center items-center py-20">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -114,6 +142,7 @@ export default function Home() {
                     )
                   )
                 }}
+                viewMode={isMobile ? 'card' : viewMode}
               />
 
               <div className="mt-6">

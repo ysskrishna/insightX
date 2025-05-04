@@ -32,3 +32,19 @@ export function getObjectBadges(detectedObjects: Array<{ class: string; confiden
     count
   }));
 }
+
+export function getRelativeTime(dateString: string): string {
+  const now = new Date()
+  const date = new Date(dateString)
+  const diff = (now.getTime() - date.getTime()) / 1000 // in seconds
+
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
+
+  if (diff < 60) return 'just now'
+  if (diff < 3600) return rtf.format(-Math.floor(diff / 60), 'minute')
+  if (diff < 86400) return rtf.format(-Math.floor(diff / 3600), 'hour')
+  if (diff < 604800) return rtf.format(-Math.floor(diff / 86400), 'day')
+  if (diff < 2592000) return rtf.format(-Math.floor(diff / 604800), 'week')
+  if (diff < 31536000) return rtf.format(-Math.floor(diff / 2592000), 'month')
+  return rtf.format(-Math.floor(diff / 31536000), 'year')
+}
