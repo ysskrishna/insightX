@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast"
 import { ObjectBadge } from "@/components/object-badge"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { ImageCard } from "@/components/image-card"
+import { ProcessingStatusBadge } from "@/components/processing-status-badge"
 
 interface ImageResultsProps {
   images: ImageResult[]
@@ -115,14 +116,7 @@ export function ImageResults({ images, onImageUpdate, onSort, sortConfig, viewMo
                   )}
                 </TableCell>
                 <TableCell>
-                  {image.is_processed ? (
-                    <Badge className="bg-black text-white font-semibold rounded px-2 py-1">Processed</Badge>
-                  ) : (
-                    <Badge className="bg-gray-700 text-white font-semibold rounded px-2 py-1 flex items-center gap-1">
-                      <span>Processing</span>
-                      <span className="animate-pulse text-white">•</span>
-                    </Badge>
-                  )}
+                  <ProcessingStatusBadge isProcessed={image.is_processed} />
                 </TableCell>
                 <TableCell>
                   {image.is_processed ? (

@@ -13,6 +13,7 @@ import { ArrowLeft, Loader2, RefreshCw } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { formatDate, getObjectBadges } from "@/lib/utils"
 import { ObjectBadge } from "@/components/object-badge"
+import { ProcessingStatusBadge } from "@/components/processing-status-badge"
 
 export default function ImageDetailsPage({ params }: { params: { imageId: string } }) {
   const [image, setImage] = useState<ImageResult | null>(null)
@@ -114,14 +115,7 @@ export default function ImageDetailsPage({ params }: { params: { imageId: string
                       <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
                       <span className="sr-only">Refresh details</span>
                     </Button>
-                    {image.is_processed ? (
-                      <Badge className="bg-black text-white font-semibold rounded px-2 py-1">Processed</Badge>
-                    ) : (
-                      <Badge className="bg-gray-700 text-white font-semibold rounded px-2 py-1 flex items-center gap-1">
-                        <span>Processing</span>
-                        <span className="animate-pulse text-white">•</span>
-                      </Badge>
-                    )}
+                    <ProcessingStatusBadge isProcessed={image.is_processed} />
                     {image.is_nsfw && <Badge variant="destructive">NSFW</Badge>}
                   </div>
                 </div>

@@ -7,6 +7,7 @@ import { Eye, RefreshCw } from "lucide-react"
 import { ObjectBadge } from "@/components/object-badge"
 import { ImageResult } from "@/lib/types"
 import { getObjectBadges, getRelativeTime, truncateText } from "@/lib/utils"
+import { ProcessingStatusBadge } from "@/components/processing-status-badge"
 
 interface ImageCardProps {
   image: ImageResult
@@ -35,14 +36,7 @@ export function ImageCard({ image, onRefresh, isRefreshing }: ImageCardProps) {
           {image.is_nsfw && (
             <Badge variant="destructive">NSFW</Badge>
           )}
-          {image.is_processed ? (
-            <Badge className="bg-black text-white font-semibold rounded">Processed</Badge>
-          ) : (
-            <Badge className="bg-gray-700 text-white font-semibold rounded flex items-center gap-1">
-              <span>Processing</span>
-              <span className="animate-pulse text-white">•</span>
-            </Badge>
-          )}
+          <ProcessingStatusBadge isProcessed={image.is_processed} />
         </div>
         {/* Object Badges */}
         {image.is_processed ? (
