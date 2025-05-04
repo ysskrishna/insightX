@@ -81,7 +81,7 @@ async def update_detection_results(image_id, detected_objects, nsfw_detections, 
             logger.error(f"Error updating detection results via API: {e}")
             raise
 
-def draw_detections(image, detections):
+def draw_detections(image, detections, nsfw_detections=None):
     draw = ImageDraw.Draw(image)
     
     # Calculate relative sizes based on image dimensions
@@ -98,6 +98,7 @@ def draw_detections(image, detections):
     except:
         font = ImageFont.load_default()  # Fallback to default font if arial.ttf is not available
     
+    # Draw regular detections with labels
     for detection in detections:
         box = detection['box']
         label = detection['class']
@@ -135,6 +136,19 @@ def draw_detections(image, detections):
             fill='green'
         )
         draw.text((text_x, text_y), text, fill='white', font=font)
+    
+    # Draw NSFW detections with red boxes (no labels)
+    if nsfw_detections:
+        for detection in nsfw_detections:
+            box = detection['box']
+            # Convert [x, y, width, height] to [x1, y1, x2, y2]
+            x1 = max(0, min(box[0] - padding, img_width))
+            y1 = max(0, min(box[1] - padding, img_height))
+            x2 = max(0, min(box[0] + box[2] + padding, img_width))  # x + width
+            y2 = max(0, min(box[1] + box[3] + padding, img_height))  # y + height
+            
+            # Draw rectangle in red
+            draw.rectangle([x1, y1, x2, y2], outline='red', width=box_width)
     
     return image
 
@@ -193,7 +207,7 @@ async def process_message(message: aio_pika.abc.AbstractIncomingMessage) -> None
             logger.info(f"YOLO detections: {detected_objects}")
             
             # Generate image with detections
-            image_with_detections = draw_detections(image, detected_objects)
+            image_with_detections = draw_detections(image, detected_objects, nsfw_detections)
             
             # Get presigned URL and processed path
             presigned_url, processed_image_path, format_info = await get_processed_presigned_url(body['image_id'], original_format)

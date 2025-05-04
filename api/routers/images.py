@@ -65,7 +65,7 @@ async def get_image_list(
     if search:
         query = query.where(models.Image.name.ilike(f"%{search}%"))
     
-    query = query.offset(offset).limit(limit)
+    query = query.order_by(models.Image.created_at.desc()).offset(offset).limit(limit)
     result = await db.execute(query)
     images = result.scalars().all()
 
