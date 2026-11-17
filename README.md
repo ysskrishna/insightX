@@ -1,5 +1,7 @@
 # InsightX
 
+[![License: AGPL-3.0](https://img.shields.io/github/license/ysskrishna/insightX)](https://github.com/ysskrishna/insightX/blob/main/LICENSE) [![GitHub release](https://img.shields.io/github/v/release/ysskrishna/insightX?label=release)](https://github.com/ysskrishna/insightX/releases) [![Author site](https://img.shields.io/badge/author-ysskrishna.space-informational)](https://ysskrishna.space)
+
 A powerful image analysis platform that provides automated insights through advanced computer vision and machine learning capabilities.
 
 ## Project Overview
@@ -91,15 +93,36 @@ docker-compose up -d
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## Built and maintained by
 
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
+InsightX is built and maintained by:
 
-The AGPL-3.0 license requires that any modifications to this software must be made available under the same license when the software is run over a network. This ensures that improvements to the software remain open source and available to the community.
+| | Name | GitHub | Role |
+|---|------|--------|------|
+| <img src="https://github.com/ysskrishna.png?size=120" width="60" height="60" alt="Y. Siva Sai Krishna"> | **Y. Siva Sai Krishna** | [@ysskrishna](https://github.com/ysskrishna) | Creator |
 
-Copyright (c) 2025 Y. Siva Sai Krishna
+## Changelog
 
+See [CHANGELOG](CHANGELOG.md) for release history.
 
 ## Support
 
-For support, please open an issue in the repository or contact the maintainers. 
+If you find this project helpful:
+
+- ⭐ Star the repository
+- 🐛 [Report issues](https://github.com/ysskrishna/insightX/issues)
+- 🔀 Submit pull requests
+- 💝 [Sponsor on GitHub](https://github.com/sponsors/ysskrishna)
+
+## License
+
+AGPL-3.0 © [Y. Siva Sai Krishna](https://github.com/ysskrishna) — see [LICENSE](LICENSE) for details.
+
+---
+
+<p align="left">
+  <a href="https://github.com/ysskrishna">Author's GitHub</a> •
+  <a href="https://linkedin.com/in/ysskrishna">Author's LinkedIn</a> •
+  <a href="https://ysskrishna.space">Author's site</a> •
+  <a href="https://github.com/ysskrishna/insightX/issues">Report Issues</a>
+</p>
