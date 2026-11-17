@@ -259,3 +259,7 @@ storage/*
 !storage/.gitkeep
 workspace/
 worker/yolo*.pt
+
+# Local secret files. Example files stay tracked.
+api/.env
+worker/.env
